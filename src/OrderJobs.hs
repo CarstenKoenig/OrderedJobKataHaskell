@@ -11,7 +11,7 @@ import Data.Char
 
 
 sort :: [Dependency] -> [Job]
-sort dependencies = undefined
+sort [] = []
 
 
 ----------------------------------------------------------------------

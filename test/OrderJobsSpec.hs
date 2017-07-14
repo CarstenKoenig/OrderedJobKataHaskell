@@ -10,12 +10,20 @@ import OrderJobs (sort, (.=>), independend)
 spec :: Spec
 spec = do
   describe "sort" $ do
-    context "given a single job with no dependencies" $
+
+    context "given no input" $ do
+      let input = []
+      it "returns an empty list" $
+        sort input `shouldBe` []
+    
+    context "given a single job with no dependencies" $ do
+      let input = [independend "a"]
       it "returns the single job" $ do
-        sort ["a" .=> Nothing] `shouldBe` ["a"]
+        pending
+
         
     it "some property holds" $ property $
-      \(str :: String) -> str == str
+      \(str :: String) -> pending
 
 
 ----------------------------------------------------------------------
