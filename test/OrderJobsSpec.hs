@@ -19,7 +19,7 @@ spec = do
     context "given a single job with no dependencies" $ do
       let input = [independend "a"]
       it "returns the single job" $ do
-        pending
+        sort input `shouldBe` ["a"]
 
         
     it "some property holds" $ property $

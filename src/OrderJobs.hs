@@ -12,6 +12,7 @@ import Data.Char
 
 sort :: [Dependency] -> [Job]
 sort [] = []
+sort [Dependency job Nothing] = [job]
 
 
 ----------------------------------------------------------------------
