@@ -15,23 +15,26 @@ spec = do
 
     context "given no input" $ do
       let input = []
-      it "returns an empty list" $
-        sort input `shouldBe` []
+      it "returns an empty list" $ do
+        let Right result = sort input
+        result `shouldBe` []
     
     context "given a single job with no dependencies" $ do
       let input = [independend "a"]
-      it "returns the single job" $
-        sort input `shouldBe` ["a"]
+      it "returns the single job" $ do
+        let Right result = sort input
+        result `shouldBe` ["a"]
 
     context "given three jobs without dependencies" $ do
       let input = map independend ["a","b","c"]
       it "returns the jobs in no significant order" $ do
-        sort input `shouldSatisfy` (setEqual ["a","b","c"])
+        let Right result = sort input
+        result `shouldSatisfy` (setEqual ["a","b","c"])
 
     context "given three jobs with a single dependency b=> c" $ do
       let input = [independend "a", "b" .=> "c", independend "c"]
       it "returns a list with all three jobs where b comes before c" $ do
-        let result = sort input
+        let Right result = sort input
         result `shouldSatisfy` (setEqual ["a","b","c"])
         result `shouldSatisfy` ("a" `earlierThan` "b")
 
@@ -45,12 +48,30 @@ spec = do
             , independend "f"
             ]
       it "should return a sequence that positions f before c, c before b, b before e and a before d containing all six jobs abcdef" $ do
-        let result = sort input
+        let Right result = sort input
         result `shouldSatisfy` (setEqual ["a","b","c","d","e","f"])
         result `shouldSatisfy` ("f" `earlierThan` "c")
         result `shouldSatisfy` ("c" `earlierThan` "b")
         result `shouldSatisfy` ("b" `earlierThan` "e")
         result `shouldSatisfy` ("a" `earlierThan` "d")
+
+    context "given multiple jobs with a self-referential job" $ do
+      let input = [independend "a", independend "b", "c" .=> "c" ]
+      it "should return an error stating that jobs can’t depend on themselves" $
+        sort input `shouldBe` Left "c depends on itself"
+
+    context "given a circular dependency chain" $ do
+      let input =
+            [ independend "a"
+            , "b" .=> "c"
+            , "c" .=> "f"
+            , "d" .=> "a"
+            , independend "e"
+            , "f" .=> "b"
+            ]
+      it "the result should be an error stating that jobs can’t have circular dependencies" $
+        sort input `shouldBe` Left "cycle found"
+        
 
 
 ----------------------------------------------------------------------
