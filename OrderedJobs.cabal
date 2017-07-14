@@ -23,7 +23,7 @@ test-suite OrderedJobs-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-moduls:        OrderJobsSpec
+  other-modules:       OrderJobsSpec
   build-depends:       base
                      , OrderedJobs
                      , hspec

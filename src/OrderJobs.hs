@@ -1,11 +1,40 @@
-
 module OrderJobs
-  (
-    sort
+  ( Job
+  , Dependency
+  , sort
+  , dependsOn
+  , independend
+  , (.=>)
   ) where
 
 import Data.Char
 
 
-sort :: String -> String
-sort = undefined
+sort :: [Dependency] -> [Job]
+sort dependencies = undefined
+
+
+----------------------------------------------------------------------
+
+independend :: Job -> Dependency
+independend job = Dependency job Nothing
+
+dependsOn :: Job -> Maybe Job -> Dependency
+dependsOn = Dependency
+
+
+(.=>) :: Job -> Maybe Job -> Dependency
+(.=>) = dependsOn
+infixl 9 .=>
+
+  
+data Dependency =
+  Dependency
+  { dependendJob :: Job
+  , dependsOnJob :: Maybe Job
+  }
+
+
+type Job = String
+
+
