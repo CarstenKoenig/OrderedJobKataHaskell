@@ -49,9 +49,10 @@ infixl 9 .=>
   
 sort :: [Dependency] -> Either String [Job]
 sort deps =
-  St.evalState
-  (flip R.runReaderT (associations deps) $ Ex.runExceptT $ sort' deps)
-  Set.empty
+  flip St.evalState Set.empty .
+  flip R.runReaderT (associations deps) .
+  Ex.runExceptT $
+  sort' deps
 
 
 ----------------------------------------------------------------------
