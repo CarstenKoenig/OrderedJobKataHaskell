@@ -10,10 +10,15 @@ using a simple *topological sort implementation*.
 I tried to follow the given steps (I literally copied the test cases from the
 kata's description) and only introduced stuff when I saw fit.
 
-But of course I already had a solution and even my *monad stack* in mind.
+If you want to find out the steps it's probably best to look at the commits
+and see the diffs - there is usually only one commit for each test case.
 
-Anyway: I hope it at least shows how you could do TDD/BDD in Haskell (if you want)
-and a hopefully somewhat nice solution to the Kata.
+A big **thumb up** to those test cases - they actually guide you to one of
+the popular [topological sort algorithms](https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search) 
+with ease.
+
+Anyway: I hope this demonstrates how you could do TDD/BDD in Haskell (if you 
+want) and a hopefully somewhat nice solution to the Kata.
 
 ## running the tests
 
