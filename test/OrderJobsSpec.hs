@@ -23,7 +23,7 @@ spec = do
 
     context "given three jobs without dependencies" $ do
       let input = map independend ["a","b","c"]
-      it "returns the jobs in no significant order" $
+      it "returns the jobs in no significant order" $ do
         sort input `shouldSatisfy` (\res -> all (`elem` res) ["a","b","c"])
 
     context "given three jobs with a single dependency b=> c" $ do
@@ -31,6 +31,7 @@ spec = do
       it "returns a list with all three jobs where b comes before c" $ do
         let result = sort input
         result `shouldSatisfy` (\res -> all (`elem` res) ["a","b","c"])
+        result `shouldSatisfy` ((== 3) . length)
         result `shouldSatisfy` ("a" `earlierThan` "b")
 
         
