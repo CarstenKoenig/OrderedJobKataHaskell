@@ -30,10 +30,17 @@ type State = Set String
 
 sort' :: [Dependency] -> Env [Job]
 sort' [] = return []
-sort' (Dependency job Nothing : rest) =
-  prependNew job $ sort' rest
-sort' (Dependency job (Just job') : rest) =
-  prependNew job' $ prependNew job $ sort' rest
+sort' deps@(Dependency job Nothing : rest) =
+  prependDeps deps job $ sort' rest
+sort' deps@(Dependency job (Just job') : rest) =
+  prependDeps deps job' $ prependNew job $ sort' rest
+
+
+prependDeps :: [Dependency] -> Job -> Env [Job] -> Env [Job]
+prependDeps deps job cont =
+  case findDep deps job of
+    Nothing -> prependNew job cont
+    Just depJob -> prependDeps deps depJob (prependNew job cont)
 
 
 prependNew :: Job -> Env [Job] -> Env [Job]
@@ -45,6 +52,12 @@ prependNew job cont = do
     St.modify (Set.insert job)
     (job :) <$> cont
   
+
+findDep :: [Dependency] -> Job -> Maybe Job
+findDep [] _ = Nothing
+findDep ((Dependency depJob depOn) : ds) job
+  | depJob == job = depOn
+  | otherwise = findDep ds job
 
 
 ----------------------------------------------------------------------

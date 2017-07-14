@@ -35,9 +35,22 @@ spec = do
         result `shouldSatisfy` (setEqual ["a","b","c"])
         result `shouldSatisfy` ("a" `earlierThan` "b")
 
-        
-    it "some property holds" $ property $
-      \(str :: String) -> pending
+    context "given multiple jobs with multiple dependencies" $ do
+      let input =
+            [ independend "a"
+            , "b" .=> "c"
+            , "c" .=> "f"
+            , "d" .=> "a"
+            , "e" .=> "b"
+            , independend "f"
+            ]
+      it "should return a sequence that positions f before c, c before b, b before e and a before d containing all six jobs abcdef" $ do
+        let result = sort input
+        result `shouldSatisfy` (setEqual ["a","b","c","d","e","f"])
+        result `shouldSatisfy` ("f" `earlierThan` "c")
+        result `shouldSatisfy` ("c" `earlierThan` "b")
+        result `shouldSatisfy` ("b" `earlierThan` "e")
+        result `shouldSatisfy` ("a" `earlierThan` "d")
 
 
 ----------------------------------------------------------------------
