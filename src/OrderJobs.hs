@@ -52,7 +52,7 @@ sort deps =
   flip St.evalState Set.empty .
   flip R.runReaderT (associations deps) .
   Ex.runExceptT $
-  sort' deps
+  sort'
 
 
 ----------------------------------------------------------------------
@@ -60,21 +60,12 @@ sort deps =
 
 type Env a = Ex.ExceptT String (R.ReaderT Deps (St.State State)) a
 
-type Deps = Map Job Job
+type Deps  = ([Job], Map Job Job)
 type State = Set String
 
 
-sort' :: [Dependency] -> Env [Job]
-sort' = foldr prepend (return [])
-  where
-    prepend :: Dependency -> Env [Job] -> Env [Job]
-    prepend (Dependency job Nothing) =
-      prependDeps Set.empty job
-    prepend (Dependency job (Just job'))
-      | job == job' =
-        const $ Ex.throwE (job ++ " depends on itself")
-      | otherwise =
-        prependDeps Set.empty job' . prependNew job
+sort' :: Env [Job]
+sort' = jobs >>= foldr (prependDeps Set.empty) (return [])
 
 
 prependDeps :: Set Job -> Job -> Env [Job] -> Env [Job]
@@ -84,8 +75,11 @@ prependDeps visited job cont
     case dependsOn of
       Nothing ->
         prependNew job cont
-      Just depJob ->
-        prependDeps (Set.insert job visited) depJob (prependNew job cont)
+      Just depJob
+        | job == depJob ->
+          Ex.throwE (job ++ " depends on itself")
+        | otherwise ->
+          prependDeps (Set.insert job visited) depJob (prependNew job cont)
   | otherwise =
     Ex.throwE "cycle found"
 
@@ -101,12 +95,18 @@ prependNew job cont = do
   
 
 findDep :: Job -> Env (Maybe Job)
-findDep job = lift $ R.asks (Map.lookup job)
+findDep job = lift $ R.asks (Map.lookup job . snd)
+
+
+jobs :: Env [Job]
+jobs = lift $ R.asks fst
 
 
 associations :: [Dependency] -> Deps
-associations deps = Map.fromList assocs
-  where assocs = mapMaybe assoc deps
-        assoc (Dependency _ Nothing) = Nothing
-        assoc (Dependency job (Just on)) = Just (job, on)
+associations deps = (js, Map.fromList assocs)
+  where
+    js = map dependendJob  deps
+    assocs = mapMaybe assoc deps
+    assoc (Dependency _ Nothing) = Nothing
+    assoc (Dependency job (Just on)) = Just (job, on)
 
