@@ -4,6 +4,8 @@ module OrderJobsSpec (main, spec) where
 import Test.Hspec
 import Test.QuickCheck
 
+import qualified Data.List
+
 import OrderJobs (sort, (.=>), independend)
 
 
@@ -24,14 +26,13 @@ spec = do
     context "given three jobs without dependencies" $ do
       let input = map independend ["a","b","c"]
       it "returns the jobs in no significant order" $ do
-        sort input `shouldSatisfy` (\res -> all (`elem` res) ["a","b","c"])
+        sort input `shouldSatisfy` (setEqual ["a","b","c"])
 
     context "given three jobs with a single dependency b=> c" $ do
       let input = [independend "a", "b" .=> "c", independend "c"]
       it "returns a list with all three jobs where b comes before c" $ do
         let result = sort input
-        result `shouldSatisfy` (\res -> all (`elem` res) ["a","b","c"])
-        result `shouldSatisfy` ((== 3) . length)
+        result `shouldSatisfy` (setEqual ["a","b","c"])
         result `shouldSatisfy` ("a" `earlierThan` "b")
 
         
@@ -40,6 +41,10 @@ spec = do
 
 
 ----------------------------------------------------------------------
+
+setEqual :: Ord a => [a] -> [a] -> Bool
+setEqual xs ys = Data.List.sort xs == Data.List.sort ys
+
 
 earlierThan :: Eq a => a -> a -> [a] -> Bool
 earlierThan a b [] = True
