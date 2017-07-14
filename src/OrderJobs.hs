@@ -13,6 +13,7 @@ import Data.Char
 sort :: [Dependency] -> [Job]
 sort [] = []
 sort (Dependency job Nothing : rest) = job : sort rest
+sort (Dependency job (Just job') : rest) = job' : job : sort rest
 
 
 ----------------------------------------------------------------------
@@ -20,11 +21,11 @@ sort (Dependency job Nothing : rest) = job : sort rest
 independend :: Job -> Dependency
 independend job = Dependency job Nothing
 
-dependsOn :: Job -> Maybe Job -> Dependency
-dependsOn = Dependency
+dependsOn :: Job -> Job -> Dependency
+dependsOn a b = Dependency a (Just b)
 
 
-(.=>) :: Job -> Maybe Job -> Dependency
+(.=>) :: Job -> Job -> Dependency
 (.=>) = dependsOn
 infixl 9 .=>
 
